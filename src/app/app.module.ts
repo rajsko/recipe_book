@@ -1,6 +1,7 @@
+import { AuthGuard } from './auth/auth-guard.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
@@ -12,6 +13,19 @@ import { ShoppingEditComponentComponent } from './ShoppingListComponents/shoppin
 import { HeaderComponent } from './header-component/header.component';
 import { RecipesComponent } from './RecipeComponents/recipes.component';
 import { DropdownDirective } from "app/shared/dropdown.directive";
+import { Routes } from "@angular/router";
+import { AppRoutingModule } from "app/app-routing.module";
+import { RecipesDefaultComponent } from './recipes/recipes-default/recipes-default.component';
+import { RecipeEditComponent } from './RecipeComponents/recipe-edit/recipe-edit.component';
+import { RecipeService } from "app/RecipeComponents/recipe.service";
+import { ShoppingListService } from "app/ShoppingListComponents/shopping-list.service";
+import { SingupComponent } from './auth/singup/singup.component';
+import { SinginComponent } from './auth/singin/singin.component';
+import {  AuthService } from "app/auth/auth.service";
+
+const routes: Routes = [
+
+]
 
 @NgModule({
   declarations: [
@@ -23,14 +37,20 @@ import { DropdownDirective } from "app/shared/dropdown.directive";
     ShoppingEditComponentComponent,
     HeaderComponent,
     RecipesComponent,
-    DropdownDirective
+    DropdownDirective,
+    RecipesDefaultComponent,
+    RecipeEditComponent,
+    SingupComponent,
+    SinginComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    AppRoutingModule,
+    ReactiveFormsModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [ShoppingListService, RecipeService, AuthService, AuthGuard],
+  bootstrap: [ AppComponent]
 })
 export class AppModule { }

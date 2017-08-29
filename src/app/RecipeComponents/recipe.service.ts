@@ -1,37 +1,78 @@
+import { AuthService } from '../auth/auth.service';
+import { Observable } from 'rxjs/Rx';
+import { Http, Response } from '@angular/http';
+import { Subject } from 'rxjs/Subject';
 import { Recipe } from "app/RecipeComponents/recipe.model";
-import { EventEmitter, Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import {Ingredient} from "app/shared/ingredient.model";
 import { ShoppingListService } from "app/ShoppingListComponents/shopping-list.service";
+import 'rxjs/add/operator/map';
+
+
 @Injectable()
 export class RecipeService {
-    recipeSelected = new EventEmitter<Recipe>();
-    constructor(private SLService: ShoppingListService){}
+    recipesChanged = new Subject<Recipe[]>();
+    constructor(private SLService: ShoppingListService,
+      private http: Http,
+      private authService: AuthService){}
 
     private recipes: Recipe[] = [
-        new Recipe('Wiener Schnitzel',
-         'Very tasty shnitzel from heart of Austria',
-         'https://bigoven-res.cloudinary.com/image/upload/main---wiener-schnitzel-8f03d26e1f0f2601215a7029.jpg',
-        [
-            new Ingredient('Meat',1),
-            new Ingredient('French fires',20)
-        ]
-        ),
-        new Recipe('Big Kahoona Burger',
-         'This is a damn good burger!',
-         'https://upload.wikimedia.org/wikipedia/en/4/48/Big_Kahuna_Burger_%28small%29.png',
-        [
-            new Ingredient("Buns",2),
-            new Ingredient("meat",1)
 
-        ]
-        )
   ];
 
+  uploadRecipes(){
+    const token = this.authService.getToken();
+    return this.http.put('https://receptar.firebaseio.com/recipes.json?auth=' + token, this.getRecipes());
+  }
+
+  fetchRecipes(){
+    
+    this.http.get('https://receptar.firebaseio.com/recipes.json')
+      .map(
+        (response: Response) =>{
+          const recipes: Recipe[] = response.json();
+          for(let recipe of recipes){
+            if (!recipe['ingredients']){
+              recipe['ingredients'] = [];
+            }
+          }
+          return recipes;
+        }
+      )
+      .subscribe(
+        (recipes: Recipe[]) => {
+            for(let recipe of recipes){
+                this.AddRecipe(recipe);
+            }
+        }
+    );
+  }
+
+
+  AddRecipe(recipe: Recipe){
+    this.recipes.push(recipe);
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  upRecipe(index: number, recipe: Recipe){
+    this.recipes[index] = recipe;
+    this.recipesChanged.next(this.recipes.slice());    
+  }
+
+  deleteRecipe(index: number){
+    this.recipes.splice(index,1);
+    this.recipesChanged.next(this.recipes.slice());
+  }
   
 
   getRecipes(){
       return this.recipes.slice();
   }
+
+
+    getRecipeByID(id: number){
+        return this.recipes[id];
+    }
 
   addIngredientsTS(ingredients: Ingredient[]){
     this.SLService.addIngredients(ingredients);

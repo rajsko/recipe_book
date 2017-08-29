@@ -1,4 +1,9 @@
-import { Component, EventEmitter, Output } from "@angular/core";
+import { AuthService } from '../auth/auth.service';
+import { Recipe } from '../RecipeComponents/recipe.model';
+import { RecipeService } from '../RecipeComponents/recipe.service';
+import { constructDependencies } from '@angular/core/src/di/reflective_provider';
+import { Component, OnInit } from '@angular/core';
+import { Response } from "@angular/http";
 
 @Component({
     selector: 'app-hdr',
@@ -7,10 +12,20 @@ import { Component, EventEmitter, Output } from "@angular/core";
 })
 
 export class HeaderComponent{
-@Output() featureSelected = new EventEmitter<string>();
+    constructor(private rs: RecipeService, private authService: AuthService){}
 
-
-    onSelect(feature:string){
-        this.featureSelected.emit(feature);
+    onSaveData(){
+        this.rs.uploadRecipes().subscribe(
+            (response: Response) => console.log(response)
+        );
     }
+
+    onFetch(){
+        this.rs.fetchRecipes();
+    }
+
+    onLogout(){
+        this.authService.logout();
+    }
+    
 }

@@ -13,12 +13,12 @@
     <div 
     class="btn-group" 
     appDropdown
-    >
-      <button type="button" class="btn btn-primary dropdown-toggle">Manage Recipe <span class="caret"></span></button>
+    >    
+      <button type="button" class="btn btn-primary dropdown-toggle" *ngIf="authService.isAuth()">Manage Recipe <span class="caret"></span></button>
       <ul class="dropdown-menu">
-        <li><a (click)="addRecipeIngredients()">Add ingredients</a></li>
-        <li><a href="#">Edit recipe</a></li>
-        <li><a href="#">Delete recipe</a></li>
+        <!-- <li><a (click)="addRecipeIngredients()">Add ingredients</a></li> -->
+        <li><a (click)="onEdit()">Edit recipe</a></li>
+        <li><a (click)="onDelete()">Delete recipe</a></li>
       </ul>
     </div>
   </div>
@@ -36,5 +36,6 @@
         {{ ingredient.name }} {{ ingredient.amount }}ks
       </li>
     </ul>
+    <button type="button" class="btn btn-primary" *ngIf="!authService.isAuth()" (click)="addRecipeIngredients()">Add to shopping list</button>
   </div>
 </div>
